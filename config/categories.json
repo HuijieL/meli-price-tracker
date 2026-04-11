@@ -1,0 +1,76 @@
+{
+  "categories": [
+    {
+      "id": "MLB1051",
+      "slug": "celulares-telefones",
+      "name_pt": "Celulares e Telefones",
+      "name_zh": "手机（大类，含配件）",
+      "parent_path": "Celulares e Telefones",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1051",
+      "note": "大类含配件，需配合 MLB1055 交叉验证"
+    },
+    {
+      "id": "MLB1055",
+      "slug": "smartphones",
+      "name_pt": "Celulares e Smartphones",
+      "name_zh": "手机（纯手机）",
+      "parent_path": "Celulares e Telefones > Celulares e Smartphones",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1055"
+    },
+    {
+      "id": "MLB417704",
+      "slug": "smartwatches-acessorios",
+      "name_pt": "Smartwatches e Acessórios",
+      "name_zh": "智能穿戴（大类）",
+      "parent_path": "Celulares e Telefones > Smartwatches e Acessórios",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB417704"
+    },
+    {
+      "id": "MLB135384",
+      "slug": "smartwatches",
+      "name_pt": "Smartwatches",
+      "name_zh": "智能手表（纯手表）",
+      "parent_path": "Celulares e Telefones > Smartwatches e Acessórios > Smartwatches",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB135384"
+    },
+    {
+      "id": "MLB1664",
+      "slug": "fones-gaming",
+      "name_pt": "Fones (PC Gaming)",
+      "name_zh": "耳机（PC Gaming 下）",
+      "parent_path": "Informática > Acessórios para PC Gaming > Fones",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1664"
+    },
+    {
+      "id": "MLB196208",
+      "slug": "fones-audio",
+      "name_pt": "Fones de Ouvido",
+      "name_zh": "耳机（音频类下）",
+      "parent_path": "Eletrônicos, Áudio e Vídeo > Áudio > Fones de Ouvido",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB196208"
+    },
+    {
+      "id": "MLB91757",
+      "slug": "tablets-acessorios",
+      "name_pt": "Tablets e Acessórios",
+      "name_zh": "平板电脑（大类）",
+      "parent_path": "Informática > Tablets e Acessórios",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB91757"
+    },
+    {
+      "id": "MLB99889",
+      "slug": "tablets",
+      "name_pt": "Tablets",
+      "name_zh": "平板电脑（纯平板）",
+      "parent_path": "Informática > Tablets e Acessórios > Tablets",
+      "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB99889"
+    }
+  ],
+  "fetch": {
+    "site_id": "MLB",
+    "top_n": 30,
+    "request_delay_ms": 500,
+    "search_endpoint": "https://api.mercadolibre.com/sites/MLB/search",
+    "item_endpoint": "https://api.mercadolibre.com/items"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "meli-price-tracker-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Phase 0 scripts for Mercado Livre top-sellers tracking (no OAuth).",
+  "scripts": {
+    "fetch": "node fetch-top-sellers.js",
+    "deliver": "node deliver.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "resend": "^4.0.0"
+  }
+}

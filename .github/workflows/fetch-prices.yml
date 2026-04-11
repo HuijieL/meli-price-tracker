@@ -1,0 +1,43 @@
+name: Fetch Meli Top Sellers
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # UTC 00:00 = 巴西 21:00
+  workflow_dispatch:        # 手动触发
+
+jobs:
+  fetch-and-notify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        working-directory: scripts
+        run: npm install
+
+      # 1. 抓取
+      - name: Fetch top sellers
+        working-directory: scripts
+        run: node fetch-top-sellers.js
+
+      # 2. 发邮件（把当日 JSON 作为邮件正文发送）
+      - name: Send daily email
+        working-directory: scripts
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: node deliver.js
+
+      # 3. 提交数据到仓库
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "data: $(date +%Y-%m-%d) [skip ci]"
+          git push
