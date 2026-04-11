@@ -320,6 +320,23 @@ async function main() {
     }
   }
 
+  // Safety guard — if the total items across all categories is 0, the
+  // upstream page almost certainly served a bot-wall (ML Akamai challenges
+  // datacenter IPs). Do NOT overwrite the existing good snapshot; exit
+  // non-zero so the workflow fails and skips the commit step.
+  const totalItems = Object.values(snapshot.categories).reduce(
+    (sum, c) => sum + (c.item_count ?? 0),
+    0,
+  );
+  if (totalItems === 0) {
+    console.error(
+      `\n!! All ${Object.keys(snapshot.categories).length} categories returned 0 items. ` +
+        'This is almost certainly a bot-wall (ML blocks datacenter IPs). ' +
+        'Refusing to write an empty snapshot. Exiting with code 2.',
+    );
+    process.exit(2);
+  }
+
   // Write daily snapshot
   const dailyPath = path.join(DAILY_DIR, `${date}.json`);
   await fs.writeFile(dailyPath, JSON.stringify(snapshot, null, 2));
