@@ -1,6 +1,6 @@
 {
   "date": "2026-04-16",
-  "fetched_at": "2026-04-17T02:15:29.180Z",
+  "fetched_at": "2026-04-17T02:44:21.131Z",
   "source": "mercadolivre-oauth-api",
   "oauth": true,
   "schema_version": 2,
@@ -1806,7 +1806,7 @@
             {
               "seller_id": 480263032,
               "official_store_id": 1656,
-              "price": 776.67
+              "price": 776
             }
           ],
           "top_prices": [
@@ -1817,7 +1817,7 @@
               "free_shipping": true
             },
             {
-              "price": 776.67,
+              "price": 776,
               "seller_id": 480263032,
               "official_store_id": 1656,
               "free_shipping": true
@@ -2301,7 +2301,7 @@
           "min_price": 969,
           "max_price": 1220.99,
           "price_spread_pct": 26.01,
-          "seller_count": 10,
+          "seller_count": 11,
           "official_sellers": [
             {
               "seller_id": 2304090869,
@@ -2334,14 +2334,14 @@
               "free_shipping": true
             },
             {
-              "price": 1059.9,
-              "seller_id": 1980696036,
+              "price": 1029,
+              "seller_id": 2565334596,
               "official_store_id": null,
               "free_shipping": true
             },
             {
-              "price": 1073.8,
-              "seller_id": 2121548446,
+              "price": 1059.9,
+              "seller_id": 1980696036,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -2583,20 +2583,14 @@
           "buy_box_seller_id": null,
           "currency": "BRL",
           "min_price": 869.9,
-          "max_price": 1080,
-          "price_spread_pct": 24.15,
+          "max_price": 1100,
+          "price_spread_pct": 26.45,
           "seller_count": 20,
           "official_sellers": [],
           "top_prices": [
             {
               "price": 869.9,
               "seller_id": 2638079458,
-              "official_store_id": null,
-              "free_shipping": true
-            },
-            {
-              "price": 870,
-              "seller_id": 194375788,
               "official_store_id": null,
               "free_shipping": true
             },
@@ -2615,6 +2609,12 @@
             {
               "price": 880,
               "seller_id": 214332300,
+              "official_store_id": null,
+              "free_shipping": true
+            },
+            {
+              "price": 899,
+              "seller_id": 169028342,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -4381,6 +4381,12 @@
               "free_shipping": true
             },
             {
+              "price": 223.27,
+              "seller_id": 239087096,
+              "official_store_id": null,
+              "free_shipping": true
+            },
+            {
               "price": 229,
               "seller_id": 2469003941,
               "official_store_id": null,
@@ -4395,12 +4401,6 @@
             {
               "price": 231,
               "seller_id": 91288529,
-              "official_store_id": null,
-              "free_shipping": true
-            },
-            {
-              "price": 235,
-              "seller_id": 469106225,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -6946,18 +6946,18 @@
             "https://http2.mlstatic.com/D_NQ_NP_615571-MLA80727570198_112024-F.jpg"
           ],
           "permalink": "",
-          "buy_box_price": 279,
+          "buy_box_price": 273.6,
           "buy_box_seller_id": null,
           "currency": "BRL",
-          "min_price": 279,
+          "min_price": 273.6,
           "max_price": 347.75,
-          "price_spread_pct": 24.64,
+          "price_spread_pct": 27.1,
           "seller_count": 20,
           "official_sellers": [
             {
               "seller_id": 480263032,
               "official_store_id": 1059,
-              "price": 329.9
+              "price": 273.6
             },
             {
               "seller_id": 1046986303,
@@ -6971,6 +6971,12 @@
             }
           ],
           "top_prices": [
+            {
+              "price": 273.6,
+              "seller_id": 480263032,
+              "official_store_id": 1059,
+              "free_shipping": true
+            },
             {
               "price": 279,
               "seller_id": 267186519,
@@ -6992,12 +6998,6 @@
             {
               "price": 289,
               "seller_id": 2199993133,
-              "official_store_id": null,
-              "free_shipping": true
-            },
-            {
-              "price": 289,
-              "seller_id": 3139481179,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -8507,18 +8507,18 @@
             "https://http2.mlstatic.com/D_NQ_NP_615571-MLA80727570198_112024-F.jpg"
           ],
           "permalink": "",
-          "buy_box_price": 279,
+          "buy_box_price": 273.6,
           "buy_box_seller_id": null,
           "currency": "BRL",
-          "min_price": 279,
+          "min_price": 273.6,
           "max_price": 347.75,
-          "price_spread_pct": 24.64,
+          "price_spread_pct": 27.1,
           "seller_count": 20,
           "official_sellers": [
             {
               "seller_id": 480263032,
               "official_store_id": 1059,
-              "price": 329.9
+              "price": 273.6
             },
             {
               "seller_id": 1046986303,
@@ -8532,6 +8532,12 @@
             }
           ],
           "top_prices": [
+            {
+              "price": 273.6,
+              "seller_id": 480263032,
+              "official_store_id": 1059,
+              "free_shipping": true
+            },
             {
               "price": 279,
               "seller_id": 267186519,
@@ -8553,12 +8559,6 @@
             {
               "price": 289,
               "seller_id": 2199993133,
-              "official_store_id": null,
-              "free_shipping": true
-            },
-            {
-              "price": 289,
-              "seller_id": 3139481179,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -8939,14 +8939,14 @@
           "seller_count": 20,
           "official_sellers": [
             {
-              "seller_id": 480263032,
-              "official_store_id": 2962,
-              "price": 1386
-            },
-            {
               "seller_id": 1168726042,
               "official_store_id": 20,
               "price": 1399
+            },
+            {
+              "seller_id": 480263032,
+              "official_store_id": 2962,
+              "price": 1463.53
             },
             {
               "seller_id": 85263796,
@@ -8997,12 +8997,6 @@
               "free_shipping": true
             },
             {
-              "price": 1386,
-              "seller_id": 480263032,
-              "official_store_id": 2962,
-              "free_shipping": true
-            },
-            {
               "price": 1389,
               "seller_id": 203232671,
               "official_store_id": null,
@@ -9017,6 +9011,12 @@
             {
               "price": 1419,
               "seller_id": 203232671,
+              "official_store_id": null,
+              "free_shipping": true
+            },
+            {
+              "price": 1450,
+              "seller_id": 472103197,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -9168,13 +9168,13 @@
             "https://http2.mlstatic.com/D_NQ_NP_773943-MLA96881534904_112025-F.jpg"
           ],
           "permalink": "",
-          "buy_box_price": 25,
+          "buy_box_price": 27.72,
           "buy_box_seller_id": null,
           "currency": "BRL",
-          "min_price": 25,
+          "min_price": 27.72,
           "max_price": 63.55,
-          "price_spread_pct": 154.2,
-          "seller_count": 6,
+          "price_spread_pct": 129.26,
+          "seller_count": 5,
           "official_sellers": [
             {
               "seller_id": 1914572101,
@@ -9193,12 +9193,6 @@
             }
           ],
           "top_prices": [
-            {
-              "price": 25,
-              "seller_id": 1013669160,
-              "official_store_id": null,
-              "free_shipping": false
-            },
             {
               "price": 27.72,
               "seller_id": 1914572101,
@@ -9220,6 +9214,12 @@
             {
               "price": 45.89,
               "seller_id": 349184934,
+              "official_store_id": null,
+              "free_shipping": false
+            },
+            {
+              "price": 63.55,
+              "seller_id": 3125017340,
               "official_store_id": null,
               "free_shipping": false
             }
@@ -9708,7 +9708,7 @@
             {
               "seller_id": 480263032,
               "official_store_id": 4398,
-              "price": 1509.01
+              "price": 1629
             },
             {
               "seller_id": 1046986303,
@@ -9776,15 +9776,15 @@
               "free_shipping": true
             },
             {
-              "price": 1509.01,
-              "seller_id": 480263032,
-              "official_store_id": 4398,
-              "free_shipping": true
-            },
-            {
               "price": 1517.51,
               "seller_id": 293783800,
               "official_store_id": null,
+              "free_shipping": true
+            },
+            {
+              "price": 1629,
+              "seller_id": 480263032,
+              "official_store_id": 4398,
               "free_shipping": true
             }
           ],
@@ -10469,14 +10469,14 @@
           "seller_count": 20,
           "official_sellers": [
             {
-              "seller_id": 480263032,
-              "official_store_id": 2962,
-              "price": 1386
-            },
-            {
               "seller_id": 1168726042,
               "official_store_id": 20,
               "price": 1399
+            },
+            {
+              "seller_id": 480263032,
+              "official_store_id": 2962,
+              "price": 1463.53
             },
             {
               "seller_id": 85263796,
@@ -10527,12 +10527,6 @@
               "free_shipping": true
             },
             {
-              "price": 1386,
-              "seller_id": 480263032,
-              "official_store_id": 2962,
-              "free_shipping": true
-            },
-            {
               "price": 1389,
               "seller_id": 203232671,
               "official_store_id": null,
@@ -10547,6 +10541,12 @@
             {
               "price": 1419,
               "seller_id": 203232671,
+              "official_store_id": null,
+              "free_shipping": true
+            },
+            {
+              "price": 1450,
+              "seller_id": 472103197,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -10763,8 +10763,8 @@
           "buy_box_seller_id": null,
           "currency": "BRL",
           "min_price": 2005.81,
-          "max_price": 2549,
-          "price_spread_pct": 27.08,
+          "max_price": 2536,
+          "price_spread_pct": 26.43,
           "seller_count": 20,
           "official_sellers": [],
           "top_prices": [
@@ -10793,8 +10793,8 @@
               "free_shipping": true
             },
             {
-              "price": 2434,
-              "seller_id": 1054208799,
+              "price": 2428,
+              "seller_id": 2969111698,
               "official_store_id": null,
               "free_shipping": true
             }
@@ -11036,7 +11036,7 @@
             {
               "seller_id": 480263032,
               "official_store_id": 4398,
-              "price": 1509.01
+              "price": 1629
             },
             {
               "seller_id": 1046986303,
@@ -11104,15 +11104,15 @@
               "free_shipping": true
             },
             {
-              "price": 1509.01,
-              "seller_id": 480263032,
-              "official_store_id": 4398,
-              "free_shipping": true
-            },
-            {
               "price": 1517.51,
               "seller_id": 293783800,
               "official_store_id": null,
+              "free_shipping": true
+            },
+            {
+              "price": 1629,
+              "seller_id": 480263032,
+              "official_store_id": 4398,
               "free_shipping": true
             }
           ],
