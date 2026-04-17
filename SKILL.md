@@ -10,7 +10,7 @@ description: >
 
 ## 数据源
 
-GitHub 仓库: https://github.com/{YOUR_USERNAME}/meli-price-tracker
+GitHub 仓库: https://github.com/HuijieL/meli-price-tracker
 
 - 最新快照: `data/daily/{今日日期}.json`
 - 昨日快照: `data/daily/{昨日日期}.json`（用于对比）
