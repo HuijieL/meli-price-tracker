@@ -50,14 +50,9 @@ jobs:
         run: |
           gh secret set ML_REFRESH_TOKEN --body "$NEW_REFRESH"
 
-      # 3. 发邮件
-      - name: Send daily email
-        working-directory: scripts
-        env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-        run: node deliver.js
-
-      # 4. 提交数据到仓库
+      # 3. 提交数据到仓库
+      #    云端只负责数据积累。分析 + 发邮件走本地 /meli skill，
+      #    见 SKILL.md。这样 prompt/分析逻辑可随时调整，不依赖 CI。
       - name: Commit data
         run: |
           git config user.name "github-actions[bot]"
