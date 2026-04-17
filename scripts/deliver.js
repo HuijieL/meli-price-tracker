@@ -128,7 +128,8 @@ function wrapInShell(analysisHtml, latest) {
     ${analysisHtml}
     <p class="footer">
       数据源: Mercado Livre OAuth API · /highlights + /products + /products/{id}/items<br>
-      分析: /meli skill · prompts/daily-self.md
+      分析: /meli skill · prompts/daily-self.md<br>
+      <strong>Design by Ben LI Huijie</strong>
     </p>
   </body>
 </html>`;
