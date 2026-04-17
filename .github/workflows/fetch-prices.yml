@@ -21,19 +21,43 @@ jobs:
         working-directory: scripts
         run: npm install
 
-      # 1. 抓取
+      # 1. 抓取 (OAuth 刷新 + highlights + products + sellers)
+      #    stdout 里的 ::set-env-local:: 行会被下一步解析用来更新 refresh_token secret
       - name: Fetch top sellers
+        id: fetch
         working-directory: scripts
-        run: node fetch-top-sellers.js
+        env:
+          ML_APP_ID: ${{ secrets.ML_APP_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+          ML_REFRESH_TOKEN: ${{ secrets.ML_REFRESH_TOKEN }}
+        run: |
+          set -o pipefail
+          node fetch-top-sellers.js 2>&1 | tee /tmp/fetch.log
+          # Extract rotated refresh_token from the magic marker, if present
+          NEW_REFRESH=$(grep '::set-env-local::ML_REFRESH_TOKEN=' /tmp/fetch.log | tail -1 | sed 's/.*ML_REFRESH_TOKEN=//')
+          if [ -n "$NEW_REFRESH" ]; then
+            echo "new_refresh_token=$NEW_REFRESH" >> $GITHUB_OUTPUT
+            echo "✅ refresh_token rotated (will be written back as secret)"
+          fi
 
-      # 2. 发邮件（把当日 JSON 作为邮件正文发送）
+      # 2. Rotate refresh_token secret so tomorrow's run uses the fresh one.
+      #    Requires a PAT with 'repo' scope saved as GH_PAT.
+      - name: Rotate ML_REFRESH_TOKEN secret
+        if: steps.fetch.outputs.new_refresh_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          NEW_REFRESH: ${{ steps.fetch.outputs.new_refresh_token }}
+        run: |
+          gh secret set ML_REFRESH_TOKEN --body "$NEW_REFRESH"
+
+      # 3. 发邮件
       - name: Send daily email
         working-directory: scripts
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: node deliver.js
 
-      # 3. 提交数据到仓库
+      # 4. 提交数据到仓库
       - name: Commit data
         run: |
           git config user.name "github-actions[bot]"

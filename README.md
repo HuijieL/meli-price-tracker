@@ -3,14 +3,21 @@
 巴西 Mercado Livre 品类 **Mais Vendidos** 排行榜每日抓取 + 日报邮件。
 为 Huawei Brazil GTM Manager 提供竞品价格情报，驱动调价决策。
 
-## 当前阶段：Phase 0 (MVP)
+仓库：<https://github.com/HuijieL/meli-price-tracker>
 
-无 OAuth、无截图、无 catalog 多卖家链路。通过 Resend 发送每日 HTML 邮件。
+## 当前阶段：Phase 1 (OAuth 接入中)
 
-> **注意**：截至 2026-04-10，Mercado Livre 已关闭对 `api.mercadolibre.com`
-> 的匿名访问（search / items 全部 403 unauthorized）。Phase 0 改为直接抓取
-> Mais Vendidos 页面 HTML 并解析 `poly-card` 组件。每页固定返回 Top 20。
-> `attributes`（内存/颜色/RAM 等）字段需要待 Phase 1 OAuth 接入后补齐。
+OAuth 应用已注册，凭证已拿到，API 能力已验证。代码改造待完成。
+详细进度与下一步续作点见 [`PROGRESS.md`](./PROGRESS.md)。
+
+> **Phase 0 背景**：截至 2026-04-10，Mercado Livre 已关闭对 `api.mercadolibre.com`
+> 的匿名访问（search / items 全部 403）。Phase 0 的 fallback 是抓取
+> Mais Vendidos 页面 HTML 并解析 `poly-card`，每页固定 Top 20，无结构化属性。
+>
+> **Phase 1 突破**：OAuth 打通后发现 `/highlights/{cat}` 就是官方 Mais Vendidos
+> 排行榜，返回 **catalog product ID + position**；配合 `/products/{pid}` 拿结构化
+> 属性、`/products/{pid}/items` 拿多卖家真实最低价。**Search API 仍 403，但已无所谓**
+> —— highlights + products 组合功能上覆盖了 search。
 
 追踪品类（8 个）：
 
@@ -69,14 +76,21 @@ RESEND_API_KEY=re_xxx node deliver.js
 
 ## GitHub Secrets
 
-| Secret | 说明 |
-|---|---|
-| `RESEND_API_KEY` | Resend API Key（发送邮件） |
+| Secret | 说明 | 状态 |
+|---|---|---|
+| `RESEND_API_KEY` | Resend API Key（发送邮件） | ✅ 已有 |
+| `ML_APP_ID` | ML 应用 ID (`1599168458123024`) | ⬜ 待推 |
+| `ML_CLIENT_SECRET` | ML 应用密钥 | ⬜ 待推 |
+| `ML_REFRESH_TOKEN` | OAuth refresh token（6 个月有效，每次用会轮换） | ⬜ 待推 |
+| `GH_PAT` | GitHub PAT（repo 权限，Actions 写回轮换后的 refresh_token） | ⬜ 待创建 |
+
+本地凭证暂存在 [`.env.local`](./.env.local)（已 gitignore）。
 
 ## 升级路线
 
-- **Phase 1** — 注册 ML 开发者账号 + OAuth
-- **Phase 2** — Catalog 多卖家真实最低价
+- **Phase 0** — ✅ HTML 抓取 + Resend 邮件（已上线）
+- **Phase 1** — 🚧 OAuth 接入（凭证就位，代码改造中）
+- **Phase 2** — Catalog 多卖家真实最低价（API 已验证可用，跟 Phase 1 合并落地）
 - **Phase 3** — Puppeteer 截图 + Cloudflare R2 存证
 - **Phase 4** — 周报 / 月报自动化（7-30 天数据积累后）
 - **Phase 5** — 季报 / 年度同比
