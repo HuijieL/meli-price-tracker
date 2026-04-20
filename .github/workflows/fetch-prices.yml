@@ -2,8 +2,9 @@ name: Fetch Meli Top Sellers
 
 on:
   schedule:
-    - cron: '1 23 * * *'   # UTC 23:01 = 巴西 20:01（避开整点高峰，GitHub Actions 高负载时段最易丢任务）
-  workflow_dispatch:        # 手动触发
+    - cron: '1 23 * * *'   # 主：UTC 23:01 = 巴西 20:01（避开整点，降低被 GH 高峰丢弃的概率）
+    - cron: '33 2 * * *'   # 备：UTC 02:33 = 巴西 23:33 同一天（主若被丢则兜底；若主已跑则 skip 退出）
+  workflow_dispatch:        # 手动触发（永远全跑，不 skip）
 
 jobs:
   fetch-and-notify:
@@ -13,17 +14,37 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # 0. 幂等检查：仅对 scheduled 运行生效。
+      #    如果今天（巴西时区）的快照已存在，本次 backup cron 直接空跑退出。
+      #    手动触发 (workflow_dispatch) 永远跑到底。
+      - name: Skip if today's snapshot already exists
+        id: check
+        run: |
+          TODAY=$(TZ=America/Sao_Paulo date +%Y-%m-%d)
+          echo "today=$TODAY" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "data/daily/${TODAY}.json" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ $TODAY 已有快照，backup cron 跳过"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "📭 $TODAY 无快照（或手动触发），继续抓取"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.skip != 'true'
         with:
           node-version: '20'
 
       - name: Install deps
+        if: steps.check.outputs.skip != 'true'
         working-directory: scripts
         run: npm install
 
       # 1. 抓取 (OAuth 刷新 + highlights + products + sellers)
       #    stdout 里的 ::set-env-local:: 行会被下一步解析用来更新 refresh_token secret
       - name: Fetch top sellers
+        if: steps.check.outputs.skip != 'true'
         id: fetch
         working-directory: scripts
         env:
@@ -43,7 +64,7 @@ jobs:
       # 2. Rotate refresh_token secret so tomorrow's run uses the fresh one.
       #    Requires a PAT with 'repo' scope saved as GH_PAT.
       - name: Rotate ML_REFRESH_TOKEN secret
-        if: steps.fetch.outputs.new_refresh_token != ''
+        if: steps.check.outputs.skip != 'true' && steps.fetch.outputs.new_refresh_token != ''
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           NEW_REFRESH: ${{ steps.fetch.outputs.new_refresh_token }}
@@ -54,9 +75,10 @@ jobs:
       #    云端只负责数据积累。分析 + 发邮件走本地 /meli skill，
       #    见 SKILL.md。这样 prompt/分析逻辑可随时调整，不依赖 CI。
       - name: Commit data
+        if: steps.check.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --cached --quiet || git commit -m "data: $(date +%Y-%m-%d) [skip ci]"
+          git diff --cached --quiet || git commit -m "data: ${{ steps.check.outputs.today }} [skip ci]"
           git push
