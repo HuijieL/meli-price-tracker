@@ -5,7 +5,7 @@
 ## 架构（两层解耦）
 
 ```
-【云端】GitHub Actions（每天 UTC 00:00 / 巴西 21:00）
+【云端】GitHub Actions（每天 UTC 23:01 / 巴西 20:01）
   └─ OAuth 刷 token → fetch-top-sellers.js → 写 data/ → git commit + push
      ❌ 不发邮件
 

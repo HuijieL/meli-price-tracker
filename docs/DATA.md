@@ -2,7 +2,7 @@
 
 **适用版本**：`schema_version: 2`（Phase 1+2，2026-04-17 起）
 **来源**：Mercado Livre OAuth API（3 个端点组合）
-**频率**：每天巴西时间 21:00（UTC 00:00）自动跑，GitHub Actions 触发
+**频率**：每天巴西时间 20:01（UTC 23:01）自动跑，GitHub Actions 触发
 **产物**：`data/daily/{YYYY-MM-DD}.json`（完整快照）+ `data/history/{cat}-{slug}.jsonl`（品类历史行）
 
 ---

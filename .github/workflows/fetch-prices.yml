@@ -2,7 +2,7 @@ name: Fetch Meli Top Sellers
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # UTC 00:00 = 巴西 21:00
+    - cron: '1 23 * * *'   # UTC 23:01 = 巴西 20:01（避开整点高峰，GitHub Actions 高负载时段最易丢任务）
   workflow_dispatch:        # 手动触发
 
 jobs:

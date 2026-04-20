@@ -8,7 +8,7 @@
 
 ## 两层架构
 
-- **云端（GitHub Actions，每天巴西 21:00）**：OAuth 刷 token → 8 品类抓 highlights + products + sellers → commit 数据。**不发邮件。**
+- **云端（GitHub Actions，每天巴西 20:01）**：OAuth 刷 token → 8 品类抓 highlights + products + sellers → commit 数据。**不发邮件。**
 - **本地（`/meli` skill）**：读本地数据 → 按 `prompts/daily-self.md` 分析 → Resend 发邮件。
 
 分析链路放本地是为了改 prompt 立即生效；数据抓取放云端是为了每日稳定不中断。
