@@ -102,6 +102,14 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function productUrl(it) {
+  if (it.catalog_product_id) {
+    return `https://www.mercadolivre.com.br/p/${it.catalog_product_id}`;
+  }
+  if (it.permalink) return it.permalink;
+  return null;
+}
+
 async function readHistory(catId, slug) {
   const file = path.join(HISTORY_DIR, `${catId}-${slug}.jsonl`);
   const raw = await fs.readFile(file, 'utf8');
@@ -136,7 +144,12 @@ function buildCategoryTable(cat, history) {
         const style = styleFor(it.brand);
         const name = escapeHtml(shortName(it));
         const price = escapeHtml(fmtPriceBR(it.min_price));
-        return `<td bgcolor="${style.bg}" style="background-color:${style.bg};padding:6px 8px;border:1px solid #ddd;font-size:11px;color:#222;white-space:nowrap"><strong>${name}</strong><br>${price}</td>`;
+        const url = productUrl(it);
+        const inner = `<strong>${name}</strong><br>${price}`;
+        const linked = url
+          ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:#222;text-decoration:none;display:block">${inner}</a>`
+          : inner;
+        return `<td bgcolor="${style.bg}" style="background-color:${style.bg};padding:6px 8px;border:1px solid #ddd;font-size:11px;color:#222;white-space:nowrap">${linked}</td>`;
       })
       .join('');
     bodyRows.push(
