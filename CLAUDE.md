@@ -2,30 +2,33 @@
 
 本项目是 Huawei Brazil GTM 的 Mercado Livre 竞品价格追踪系统。Claude Code 在本目录工作时遵守以下约定。
 
-## 架构（两层解耦）
+## 架构（云端一条龙 + 本地按需备用）
 
 ```
-【云端】GitHub Actions（每天 UTC 23:01 / 巴西 20:01）
-  └─ OAuth 刷 token → fetch-top-sellers.js → 写 data/ → git commit + push
-     ❌ 不发邮件
+【主路径 — 自动】GitHub Actions（每天 UTC 10:30 / 巴西 7:30）
+  ├─ OAuth 刷 token → fetch-top-sellers.js → 写 data/ → git commit + push
+  ├─ generate-report.js → /tmp/meli-15d-report.md  (15 天 Top 5 简报)
+  └─ deliver.js → Resend 发邮件 → 巴西 8:00 前抵达 lihuijie129@gmail.com ✓
 
-【本地】/meli skill（按需触发）
-  └─ git pull → 读 data/daily/ → 按 prompts/daily-self.md 分析 →
-     /tmp/meli-analysis.md → scripts/deliver.js 发 Resend 邮件
+【备用 — 手动】/meli skill（本地按需）
+  ├─ /meli           → pull → generate-report.js → 终端预览 (默认不发邮件)
+  ├─ /meli send      → 上面 + 显式发邮件
+  └─ /meli deep      → 跑 prompts/daily-self.md 长篇 GTM 分析 (ad-hoc)
 ```
 
-**为什么拆分**：分析逻辑要灵活迭代（改 prompt 立即生效），数据抓取要稳定不中断。两层职责解耦，互不依赖。
+**为什么这样设计**：用户希望零人工触发，每天巴西早 8 点自动收日报；本地 skill 只作"想看时随时看"的备用通道。`generate-report.js` 是纯脚本无 LLM 依赖，本地与云端跑同一份代码 + 同一份 markdown 模板。
 
 ## 目录职责
 
 | 路径 | 职责 | 谁可以改 |
 |---|---|---|
-| `scripts/fetch-top-sellers.js` | 云端抓数据（OAuth 三段式 pipeline） | 稳定，少改 |
-| `scripts/deliver.js` | 本地发邮件（Resend + marked 渲染） | 偶尔改模板 |
+| `scripts/fetch-top-sellers.js` | 云端 + 本地抓数据（OAuth 三段式 pipeline） | 稳定，少改 |
+| `scripts/generate-report.js` | 15 天 Top 5 markdown 报告生成（云端 + 本地共用） | 调表格/emoji 时 |
+| `scripts/deliver.js` | Resend 邮件（marked 渲染 markdown 套外壳） | 偶尔改外壳模板 |
 | `scripts/lib/ml-oauth.js` | refresh_token 刷新 + 轮换持久化 | 别乱动 |
 | `scripts/lib/ml-api.js` | MLClient：highlights / products / items | 别乱动 |
-| `prompts/daily-self.md` | 报告结构 SSOT（改这里 `/meli` 下次立即生效） | **常改** |
-| `config/categories.json` | 8 品类配置 | 改品类时 |
+| `prompts/daily-self.md` | **ad-hoc 深度分析模板**（仅 `/meli deep` 用，不再是默认日报） | 偶尔改 |
+| `config/categories.json` | 8 品类配置（含 name_zh / name_en） | 改品类时 |
 | `data/daily/{date}.json` | 每日快照（schema v2） | CI 写，手勿动 |
 | `data/history/{cat}.jsonl` | 品类时序历史 | CI 写，手勿动 |
 | `.env.local` | 本地凭证（gitignored） | 手动维护 |

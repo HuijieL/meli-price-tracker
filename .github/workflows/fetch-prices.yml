@@ -2,8 +2,8 @@ name: Fetch Meli Top Sellers
 
 on:
   schedule:
-    - cron: '1 23 * * *'   # 主：UTC 23:01 = 巴西 20:01（避开整点，降低被 GH 高峰丢弃的概率）
-    - cron: '33 2 * * *'   # 备：UTC 02:33 = 巴西 23:33 同一天（主若被丢则兜底；若主已跑则 skip 退出）
+    - cron: '30 10 * * *'  # 主：UTC 10:30 = 巴西 7:30（fetch + email，预留 30min 让邮件 8:00 前抵达）
+    - cron: '0 13 * * *'   # 备：UTC 13:00 = 巴西 10:00（主挂时兜底；若主已跑 skip 退出）
   workflow_dispatch:        # 手动触发（永远全跑，不 skip）
 
 jobs:
@@ -72,8 +72,7 @@ jobs:
           gh secret set ML_REFRESH_TOKEN --body "$NEW_REFRESH"
 
       # 3. 提交数据到仓库
-      #    云端只负责数据积累。分析 + 发邮件走本地 /meli skill，
-      #    见 SKILL.md。这样 prompt/分析逻辑可随时调整，不依赖 CI。
+      #    云端负责数据积累 + 发邮件（一条龙）。本地 /meli skill 仅为按需备用。
       - name: Commit data
         if: steps.check.outputs.skip != 'true'
         run: |
@@ -82,3 +81,19 @@ jobs:
           git add data/
           git diff --cached --quiet || git commit -m "data: ${{ steps.check.outputs.today }} [skip ci]"
           git push
+
+      # 4. 生成 15 日 Top 5 markdown 报告（每品类一张表）
+      - name: Generate 15-day Top 5 report
+        if: steps.check.outputs.skip != 'true'
+        working-directory: scripts
+        run: node generate-report.js --out /tmp/meli-15d-report.md
+
+      # 5. 通过 Resend 发邮件（订阅人在 deliver.js TO 常量里）
+      - name: Send email via Resend
+        if: steps.check.outputs.skip != 'true'
+        working-directory: scripts
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          node deliver.js --md /tmp/meli-15d-report.md \
+            --subject "📊 Meli 15日榜单 — ${{ steps.check.outputs.today }}"

@@ -90,12 +90,12 @@ function wrapInShell(analysisHtml, latest) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Meli 日报 — ${latest.date}</title>
+    <title>Meli 15日榜单 — ${latest.date}</title>
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
           'PingFang SC', 'Microsoft YaHei', sans-serif;
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 24px;
         color: #222;
@@ -106,12 +106,11 @@ function wrapInShell(analysisHtml, latest) {
       h1 { font-size: 22px; margin: 0 0 8px; }
       h2 { font-size: 18px; margin: 28px 0 12px; padding-top: 8px; border-top: 1px solid #eee; }
       h3 { font-size: 15px; margin: 20px 0 8px; }
-      table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 12px 0; }
-      th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+      table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 12px 0; }
+      th, td { padding: 6px 8px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
       th { background: #f5f5f5; border-bottom: 2px solid #ddd; }
       td { font-variant-numeric: tabular-nums; }
       code { background: #f5f5f5; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
-      blockquote { border-left: 3px solid #0064d2; margin: 12px 0; padding: 4px 12px; color: #555; background: #f9f9f9; }
       .header { border-bottom: 2px solid #0064d2; padding-bottom: 12px; margin-bottom: 16px; }
       .meta { color: #666; font-size: 13px; margin: 4px 0 0; }
       .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; color: #999; font-size: 12px; }
@@ -119,16 +118,16 @@ function wrapInShell(analysisHtml, latest) {
   </head>
   <body>
     <div class="header">
-      <h1>📊 Meli 日报 — ${latest.date}</h1>
+      <h1>📊 Meli 15日 Top 5 榜单 — ${latest.date}</h1>
       <p class="meta">
-        Mercado Livre 巴西 · Mais Vendidos 排行榜<br>
+        Mercado Livre 巴西 · Mais Vendidos · 近 15 天 Top 5 排名<br>
         ${catCount} 品类 · ${totalItems} 商品 · 抓取时间 ${latest.fetched_at ?? '-'}
       </p>
     </div>
     ${analysisHtml}
     <p class="footer">
-      数据源: Mercado Livre OAuth API · /highlights + /products + /products/{id}/items<br>
-      分析: /meli skill · prompts/daily-self.md<br>
+      数据源 / Source: Mercado Livre OAuth API · /highlights + /products + /products/{id}/items<br>
+      自动调度 / Auto-scheduled: GitHub Actions · 巴西时间 7:30 抓取 · 8:00 前送达<br>
       <strong>Design by Ben LI Huijie</strong>
     </p>
   </body>
@@ -149,7 +148,7 @@ async function main() {
   const latest = await loadLatestSnapshot();
   const html = wrapInShell(analysisHtml, latest);
 
-  const subject = args.subject ?? `📊 Meli 日报 — ${latest.date}`;
+  const subject = args.subject ?? `📊 Meli 15日榜单 — ${latest.date}`;
   const to = args.to ? args.to.split(',').map((s) => s.trim()) : TO;
 
   const resend = new Resend(apiKey);

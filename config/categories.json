@@ -5,6 +5,7 @@
       "slug": "celulares-telefones",
       "name_pt": "Celulares e Telefones",
       "name_zh": "手机（大类，含配件）",
+      "name_en": "Phones (broad, incl. accessories)",
       "parent_path": "Celulares e Telefones",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1051",
       "note": "大类含配件，需配合 MLB1055 交叉验证"
@@ -14,6 +15,7 @@
       "slug": "smartphones",
       "name_pt": "Celulares e Smartphones",
       "name_zh": "手机（纯手机）",
+      "name_en": "Smartphones",
       "parent_path": "Celulares e Telefones > Celulares e Smartphones",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1055"
     },
@@ -22,6 +24,7 @@
       "slug": "smartwatches-acessorios",
       "name_pt": "Smartwatches e Acessórios",
       "name_zh": "智能穿戴（大类）",
+      "name_en": "Smartwatches & Accessories",
       "parent_path": "Celulares e Telefones > Smartwatches e Acessórios",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB417704"
     },
@@ -30,6 +33,7 @@
       "slug": "smartwatches",
       "name_pt": "Smartwatches",
       "name_zh": "智能手表（纯手表）",
+      "name_en": "Smartwatches",
       "parent_path": "Celulares e Telefones > Smartwatches e Acessórios > Smartwatches",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB135384"
     },
@@ -38,6 +42,7 @@
       "slug": "fones-gaming",
       "name_pt": "Fones (PC Gaming)",
       "name_zh": "耳机（PC Gaming 下）",
+      "name_en": "Headphones (PC Gaming)",
       "parent_path": "Informática > Acessórios para PC Gaming > Fones",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB1664"
     },
@@ -46,6 +51,7 @@
       "slug": "fones-audio",
       "name_pt": "Fones de Ouvido",
       "name_zh": "耳机（音频类下）",
+      "name_en": "Headphones (Audio)",
       "parent_path": "Eletrônicos, Áudio e Vídeo > Áudio > Fones de Ouvido",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB196208"
     },
@@ -54,6 +60,7 @@
       "slug": "tablets-acessorios",
       "name_pt": "Tablets e Acessórios",
       "name_zh": "平板电脑（大类）",
+      "name_en": "Tablets & Accessories",
       "parent_path": "Informática > Tablets e Acessórios",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB91757"
     },
@@ -62,6 +69,7 @@
       "slug": "tablets",
       "name_pt": "Tablets",
       "name_zh": "平板电脑（纯平板）",
+      "name_en": "Tablets",
       "parent_path": "Informática > Tablets e Acessórios > Tablets",
       "mais_vendidos_url": "https://www.mercadolivre.com.br/mais-vendidos/MLB99889"
     }

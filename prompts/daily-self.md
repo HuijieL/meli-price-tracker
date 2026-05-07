@@ -1,4 +1,8 @@
-# Meli 日报 — GTM Manager 决策版
+# Meli 日报 — GTM Manager 决策版（ad-hoc 深度分析模板）
+
+> ⚠️ **使用范围**：本模板**仅由 `/meli deep` 触发**，不再是默认日报。
+> 默认每天的「15 天 Top 5 简报」由云端 GitHub Actions 在巴西 8:00 前自动发送，由 `scripts/generate-report.js` 生成，不依赖此 prompt。
+> 当需要做紧急关注 / 价格变动深挖 / Huawei 状态 / 价格带分布 / 定价建议这类**高密度 GTM 分析**时，才用这个模板。
 
 ## 你的角色
 你是一位资深消费电子市场分析师，为 Huawei Brazil 的 GTM Manager 提供每日竞品情报。
