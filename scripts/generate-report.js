@@ -3,13 +3,16 @@
  * Meli 15-day Top 5 Report Generator
  *
  * Reads `data/history/{cat}-{slug}.jsonl` (one line per day, schema v2)
- * and emits a markdown file with one table per category:
+ * and emits an HTML fragment with one table per category:
  *   rows = #1..#5 ranks
- *   cols = last 15 days (left = today, right = 15 days ago)
- *   cells = "🟦 Brand Model R$xxx" with brand-color emoji prefix
+ *   cols = last 15 days (left = 15 days ago, right = today)
+ *   cells = brand-colored background filled with "Brand Model + R$ price"
+ *
+ * Email-safe HTML: <td bgcolor="..."> + inline style + small font-size,
+ * compatible with Gmail / Apple Mail / iOS Mail / Outlook.
  *
  * Usage:
- *   node generate-report.js --out /tmp/meli-15d-report.md
+ *   node generate-report.js --out /tmp/meli-15d-report.html
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -35,22 +38,33 @@ const CATEGORY_ORDER = [
   'MLB91757',    // 平板大类
 ];
 
-const BRAND_EMOJI = {
-  huawei: '🟥',
-  honor: '🟨',
-  samsung: '🟦',
-  motorola: '🟧',
-  xiaomi: '🟩', mi: '🟩', redmi: '🟩', poco: '🟩',
-  apple: '🟪',
-  realme: '🟫',
-  jbl: '⬛', soundcore: '⬛', anker: '⬛',
-  amazfit: '⬛', garmin: '⬛', sony: '⬛',
-  bose: '⬛', logitech: '⬛', edifier: '⬛',
+// 品牌 → { 浅色填充背景, 中文名展示, 标记色 emoji（仅图例用）}
+const BRAND_STYLE = {
+  huawei:    { bg: '#f4cccc', label: 'Huawei',   chip: '🟥' },
+  honor:     { bg: '#fff2cc', label: 'Honor',    chip: '🟨' },
+  samsung:   { bg: '#cfe2f3', label: 'Samsung',  chip: '🟦' },
+  motorola:  { bg: '#fce5cd', label: 'Motorola', chip: '🟧' },
+  xiaomi:    { bg: '#d9ead3', label: 'Xiaomi',   chip: '🟩' },
+  mi:        { bg: '#d9ead3', label: 'Xiaomi',   chip: '🟩' },
+  redmi:     { bg: '#d9ead3', label: 'Xiaomi',   chip: '🟩' },
+  poco:      { bg: '#d9ead3', label: 'Xiaomi',   chip: '🟩' },
+  apple:     { bg: '#d9d2e9', label: 'Apple',    chip: '🟪' },
+  realme:    { bg: '#ead1dc', label: 'Realme',   chip: '🟫' },
+  jbl:       { bg: '#d9d9d9', label: 'JBL',      chip: '⬛' },
+  soundcore: { bg: '#d9d9d9', label: 'Soundcore',chip: '⬛' },
+  anker:     { bg: '#d9d9d9', label: 'Anker',    chip: '⬛' },
+  amazfit:   { bg: '#d9d9d9', label: 'Amazfit',  chip: '⬛' },
+  garmin:    { bg: '#d9d9d9', label: 'Garmin',   chip: '⬛' },
+  sony:      { bg: '#d9d9d9', label: 'Sony',     chip: '⬛' },
+  bose:      { bg: '#d9d9d9', label: 'Bose',     chip: '⬛' },
+  logitech:  { bg: '#d9d9d9', label: 'Logitech', chip: '⬛' },
+  edifier:   { bg: '#d9d9d9', label: 'Edifier',  chip: '⬛' },
 };
+const DEFAULT_STYLE = { bg: '#ffffff', label: 'Other', chip: '⬜' };
 
-function emojiFor(brand) {
-  if (!brand) return '⬜';
-  return BRAND_EMOJI[brand.toLowerCase()] ?? '⬜';
+function styleFor(brand) {
+  if (!brand) return DEFAULT_STYLE;
+  return BRAND_STYLE[brand.toLowerCase()] ?? DEFAULT_STYLE;
 }
 
 function shortName(it) {
@@ -62,8 +76,8 @@ function shortName(it) {
   } else {
     s = [brand, tail].filter(Boolean).join(' ').trim();
   }
-  if (!s) return (it.title ?? '').slice(0, 24);
-  return s.length > 24 ? s.slice(0, 24) : s;
+  if (!s) return (it.title ?? '').slice(0, 22);
+  return s.length > 22 ? s.slice(0, 22) : s;
 }
 
 function fmtPriceBR(p) {
@@ -80,6 +94,14 @@ function isNewSchema(line) {
   return line.items?.[0] && 'catalog_product_id' in line.items[0];
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 async function readHistory(catId, slug) {
   const file = path.join(HISTORY_DIR, `${catId}-${slug}.jsonl`);
   const raw = await fs.readFile(file, 'utf8');
@@ -88,67 +110,97 @@ async function readHistory(catId, slug) {
 }
 
 function buildCategoryTable(cat, history) {
-  const days = history.slice(-WINDOW_DAYS).reverse();
+  // 取最后 15 天，左=最早，右=今天 (升序保留)
+  const days = history.slice(-WINDOW_DAYS);
   if (days.length === 0) {
-    return `## ${cat.name_zh} / ${cat.name_en}\n\n_无 schema v2 数据可显示_\n`;
+    return `<h2>${escapeHtml(cat.name_zh)} / ${escapeHtml(cat.name_en)}</h2>
+<p><em>无 schema v2 数据可显示 / no v2 data</em></p>`;
   }
 
-  const dateRange = `${days[days.length - 1].date} → ${days[0].date}`;
-  const headerRow = '| Rank \\ Date | ' + days.map((d) => fmtDateMD(d.date)).join(' | ') + ' |';
-  const sepRow = '|---|' + days.map(() => '---').join('|') + '|';
+  const dateRange = `${days[0].date} → ${days[days.length - 1].date}`;
+  const headerCells = days
+    .map(
+      (d) =>
+        `<th style="padding:6px 8px;border:1px solid #ddd;background:#f5f5f5;font-weight:600;font-size:11px">${fmtDateMD(d.date)}</th>`,
+    )
+    .join('');
 
-  const rows = [];
+  const bodyRows = [];
   for (let rank = 1; rank <= TOP_N; rank++) {
-    const cells = days.map((d) => {
-      const it = d.items.find((x) => x.rank === rank);
-      if (!it) return '—';
-      const emoji = emojiFor(it.brand);
-      const name = shortName(it);
-      const price = fmtPriceBR(it.min_price);
-      return `${emoji} ${name} ${price}`;
-    });
-    rows.push(`| **#${rank}** | ${cells.join(' | ')} |`);
+    const tds = days
+      .map((d) => {
+        const it = d.items.find((x) => x.rank === rank);
+        if (!it) {
+          return `<td bgcolor="#ffffff" style="background-color:#ffffff;padding:6px 8px;border:1px solid #ddd;font-size:11px;color:#999">—</td>`;
+        }
+        const style = styleFor(it.brand);
+        const name = escapeHtml(shortName(it));
+        const price = escapeHtml(fmtPriceBR(it.min_price));
+        return `<td bgcolor="${style.bg}" style="background-color:${style.bg};padding:6px 8px;border:1px solid #ddd;font-size:11px;color:#222;white-space:nowrap"><strong>${name}</strong><br>${price}</td>`;
+      })
+      .join('');
+    bodyRows.push(
+      `<tr><td style="padding:6px 8px;border:1px solid #ddd;background:#f5f5f5;font-weight:600;font-size:11px">#${rank}</td>${tds}</tr>`,
+    );
   }
 
-  return [
-    `## ${cat.name_zh} / ${cat.name_en}`,
-    `_Source ${cat.id} · ${days.length} days (${dateRange}) · 价格 = catalog \`min_price\`_`,
-    '',
-    headerRow,
-    sepRow,
-    ...rows,
-    '',
-  ].join('\n');
+  return `
+<h2 style="margin-top:24px;margin-bottom:4px;font-size:18px">${escapeHtml(cat.name_zh)} / ${escapeHtml(cat.name_en)}</h2>
+<p style="margin:0 0 8px;color:#666;font-size:12px"><em>Source ${escapeHtml(cat.id)} · ${days.length} days (${dateRange}) · 价格 = catalog <code>min_price</code></em></p>
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:11px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif">
+  <thead>
+    <tr>
+      <th style="padding:6px 8px;border:1px solid #ddd;background:#f5f5f5;font-weight:600;font-size:11px">Rank \\ Date</th>
+      ${headerCells}
+    </tr>
+  </thead>
+  <tbody>
+    ${bodyRows.join('\n    ')}
+  </tbody>
+</table>
+`.trim();
 }
 
-function buildPreface(allCats, latestDate) {
-  return [
-    `# 📊 Meli 15日 Top 5 榜单 / 15-Day Top 5 Leaderboard`,
-    ``,
-    `**截至 / As of**: ${latestDate} · 巴西时间 Brazil time`,
-    '**数据源 / Source**: Mercado Livre OAuth API (`/highlights` + `/products` + `/items`)',
-    '**价格字段 / Price field**: `min_price` — catalog 下多卖家真实最低价',
-    ``,
-    `**品牌色块图例 / Brand color legend**:`,
-    `🟥 Huawei · 🟨 Honor · 🟦 Samsung · 🟧 Motorola · 🟩 Xiaomi 家族 (Mi/Redmi) · 🟪 Apple · 🟫 Realme · ⬛ JBL/Soundcore/Anker/Amazfit/Garmin · ⬜ 其他/小品牌`,
-    ``,
-    `---`,
-    ``,
-  ].join('\n');
+function buildLegend() {
+  const seen = new Set();
+  const chips = [];
+  for (const [, style] of Object.entries(BRAND_STYLE)) {
+    if (seen.has(style.label)) continue;
+    seen.add(style.label);
+    chips.push(
+      `<span bgcolor="${style.bg}" style="display:inline-block;background-color:${style.bg};padding:2px 8px;margin:2px;border:1px solid #ccc;border-radius:3px;font-size:11px">${style.chip} ${style.label}</span>`,
+    );
+  }
+  chips.push(
+    `<span style="display:inline-block;background-color:#ffffff;padding:2px 8px;margin:2px;border:1px solid #ccc;border-radius:3px;font-size:11px">⬜ 其他/Other</span>`,
+  );
+  return chips.join(' ');
+}
+
+function buildPreface(latestDate) {
+  return `
+<h1 style="margin:0 0 8px;font-size:22px">📊 Meli 15日 Top 5 榜单 / 15-Day Top 5 Leaderboard</h1>
+<p style="margin:4px 0;color:#444;font-size:13px"><strong>截至 / As of</strong>: ${escapeHtml(latestDate)} · 巴西时间 Brazil time</p>
+<p style="margin:4px 0;color:#444;font-size:13px"><strong>数据源 / Source</strong>: Mercado Livre OAuth API (<code>/highlights</code> + <code>/products</code> + <code>/items</code>)</p>
+<p style="margin:4px 0;color:#444;font-size:13px"><strong>价格字段 / Price field</strong>: <code>min_price</code> — catalog 下多卖家真实最低价 / catalog multi-seller real lowest price</p>
+<p style="margin:8px 0 4px;color:#444;font-size:13px"><strong>品牌色块图例 / Brand color legend</strong>:</p>
+<p style="margin:0 0 12px">${buildLegend()}</p>
+<hr style="border:none;border-top:1px solid #eee;margin:16px 0">
+`.trim();
 }
 
 function buildFooter() {
-  return [
-    `---`,
-    ``,
-    `_自动生成 / Auto-generated by GitHub Actions · 每天巴西时间 7:30 抓取 · 8:00 前送达_`,
-    `_Repo: HuijieL/meli-price-tracker · 设计 Design by Ben LI Huijie_`,
-    ``,
-  ].join('\n');
+  return `
+<hr style="border:none;border-top:1px solid #eee;margin-top:32px">
+<p style="color:#999;font-size:11px;margin-top:8px">
+  自动生成 / Auto-generated by GitHub Actions · 每天巴西时间 7:30 抓取 · 8:00 前送达<br>
+  Repo: <a href="https://github.com/HuijieL/meli-price-tracker" style="color:#0064d2">HuijieL/meli-price-tracker</a> · 设计 Design by Ben LI Huijie
+</p>
+`.trim();
 }
 
 function parseArgs(argv) {
-  const args = { out: '/tmp/meli-15d-report.md' };
+  const args = { out: '/tmp/meli-15d-report.html' };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--out') args.out = argv[++i];
   }
@@ -174,14 +226,14 @@ async function main() {
     sections.push(buildCategoryTable(cat, history));
   }
 
-  const md = [
-    buildPreface(catsRaw.categories, latestDate || '—'),
+  const html = [
+    buildPreface(latestDate || '—'),
     sections.join('\n'),
     buildFooter(),
   ].join('\n');
 
-  await fs.writeFile(args.out, md, 'utf8');
-  console.log(`✅ Wrote ${args.out} (${md.length} bytes, ${sections.length} categories)`);
+  await fs.writeFile(args.out, html, 'utf8');
+  console.log(`✅ Wrote ${args.out} (${html.length} bytes, ${sections.length} categories)`);
 }
 
 const invokedDirectly =
@@ -193,4 +245,4 @@ if (invokedDirectly) {
   });
 }
 
-export { buildCategoryTable, emojiFor, shortName, fmtPriceBR };
+export { buildCategoryTable, styleFor, shortName, fmtPriceBR };

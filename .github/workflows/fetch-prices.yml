@@ -82,11 +82,11 @@ jobs:
           git diff --cached --quiet || git commit -m "data: ${{ steps.check.outputs.today }} [skip ci]"
           git push
 
-      # 4. 生成 15 日 Top 5 markdown 报告（每品类一张表）
+      # 4. 生成 15 日 Top 5 HTML 报告（每品类一张填色表格）
       - name: Generate 15-day Top 5 report
         if: steps.check.outputs.skip != 'true'
         working-directory: scripts
-        run: node generate-report.js --out /tmp/meli-15d-report.md
+        run: node generate-report.js --out /tmp/meli-15d-report.html
 
       # 5. 通过 Resend 发邮件（订阅人在 deliver.js TO 常量里）
       - name: Send email via Resend
@@ -95,5 +95,5 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          node deliver.js --md /tmp/meli-15d-report.md \
+          node deliver.js --html /tmp/meli-15d-report.html \
             --subject "📊 Meli 15日榜单 — ${{ steps.check.outputs.today }}"
