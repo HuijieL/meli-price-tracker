@@ -91,9 +91,22 @@ jobs:
       # 5. 通过 Resend 发邮件（订阅人在 deliver.js TO 常量里）
       - name: Send email via Resend
         if: steps.check.outputs.skip != 'true'
+        continue-on-error: true
         working-directory: scripts
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           node deliver.js --html /tmp/meli-15d-report.html \
             --subject "📊 Meli 15日榜单 — ${{ steps.check.outputs.today }}"
+
+      # 6. 推 Telegram「排行榜」频道（与邮件并行的第二通道）
+      #    邮件发的是 15 天 × Top5 横向网格，Telegram 没有 table 标签，
+      #    所以这里推的是**今日 Top 20 纵向列表 + 排名箭头**，形态不同、互补。
+      #    continue-on-error：任一通道挂掉不连累另一个。
+      - name: Push rankings to Telegram
+        if: steps.check.outputs.skip != 'true'
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_RANKING: ${{ secrets.TG_CHAT_RANKING }}
+        run: node scripts/deliver-telegram.js

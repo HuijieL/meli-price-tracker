@@ -7,8 +7,9 @@
 ```
 【主路径 — 自动】GitHub Actions（每天 UTC 10:30 / 巴西 7:30）
   ├─ OAuth 刷 token → fetch-top-sellers.js → 写 data/ → git commit + push
-  ├─ generate-report.js → /tmp/meli-15d-report.md  (15 天 Top 5 简报)
-  └─ deliver.js → Resend 发邮件 → 巴西 8:00 前抵达 lihuijie129@gmail.com ✓
+  ├─ generate-report.js → /tmp/meli-15d-report.html (15 天 Top 5 网格)
+  ├─ deliver.js → Resend 发邮件 → 巴西 8:00 前抵达 lihuijie129@gmail.com ✓
+  └─ deliver-telegram.js → Telegram「排行榜」频道（4 个纯品类各一条 Top 20）
 
 【备用 — 手动】/meli skill（本地按需）
   ├─ /meli           → pull → generate-report.js → 终端预览 (默认不发邮件)
@@ -25,6 +26,8 @@
 | `scripts/fetch-top-sellers.js` | 云端 + 本地抓数据（OAuth 三段式 pipeline） | 稳定，少改 |
 | `scripts/generate-report.js` | 15 天 Top 5 markdown 报告生成（云端 + 本地共用） | 调表格/emoji 时 |
 | `scripts/deliver.js` | Resend 邮件（marked 渲染 markdown 套外壳） | 偶尔改外壳模板 |
+| `scripts/deliver-telegram.js` | Telegram 排行榜日推（今日 Top 20 + 排名箭头） | 改 TG 版式在这里 |
+| `scripts/lib/telegram.js` | Telegram 发送层（分页 / 限流 / 重试） | 稳定，与 price-check 同源拷贝 |
 | `scripts/lib/ml-oauth.js` | refresh_token 刷新 + 轮换持久化 | 别乱动 |
 | `scripts/lib/ml-api.js` | MLClient：highlights / products / items | 别乱动 |
 | `prompts/daily-self.md` | **ad-hoc 深度分析模板**（仅 `/meli deep` 用，不再是默认日报） | 偶尔改 |
@@ -90,7 +93,21 @@ cd "/Users/li/Desktop/Meli- tracker/scripts" && node deliver.js --md /tmp/meli-a
 
 # 手动触发 Actions（更安全，不会导致 secret 失步）
 cd "/Users/li/Desktop/Meli- tracker" && gh workflow run fetch-prices.yml && gh run watch
+
+# Telegram 本地预览（不发）
+node scripts/deliver-telegram.js --dry
+node scripts/deliver-telegram.js --dry --include-parent   # 连 4 个大类一起
 ```
+
+**Telegram 默认只推 4 个纯品类**（手机/手表/耳机/平板），遵守上面「以纯品类为主」
+的约定；大类含配件、噪音大，要看加 `--include-parent`。
+
+邮件发的是 15 天 × Top5 **横向网格**，Telegram 没有 table 标签，推的是**今日
+Top 20 纵向列表 + 排名箭头** —— 两个通道形态不同、互补，不要试图统一。
+
+新增 secret：`TG_BOT_TOKEN`（与 price-check 共用同一个 bot）、
+`TG_CHAT_RANKING`（排行榜频道 id）。命令交互在
+`/Users/li/Desktop/ml-price-bot`（Cloudflare Worker）。
 
 凭证同步、6 个月重授权、GH_PAT 权限 → [docs/OPERATIONS.md](docs/OPERATIONS.md)。
 
