@@ -1,0 +1,35 @@
+name: Probe price endpoints (diagnostic)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        working-directory: scripts
+        run: npm install
+      - name: Probe
+        id: probe
+        working-directory: scripts
+        env:
+          ML_APP_ID: ${{ secrets.ML_APP_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+          ML_REFRESH_TOKEN: ${{ secrets.ML_REFRESH_TOKEN }}
+        run: |
+          set -o pipefail
+          node probe-price-endpoints.js 2>&1 | grep -v '::set-env-local::ML_ACCESS_TOKEN' | tee /tmp/probe.log
+          NEW_REFRESH=$(grep '::set-env-local::ML_REFRESH_TOKEN=' /tmp/probe.log | tail -1 | sed 's/.*ML_REFRESH_TOKEN=//')
+          echo "::add-mask::$NEW_REFRESH"
+          echo "new_refresh_token=$NEW_REFRESH" >> $GITHUB_OUTPUT
+      - name: Rotate ML_REFRESH_TOKEN secret
+        if: always() && steps.probe.outputs.new_refresh_token != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          NEW_REFRESH: ${{ steps.probe.outputs.new_refresh_token }}
+        run: gh secret set ML_REFRESH_TOKEN --body "$NEW_REFRESH"
