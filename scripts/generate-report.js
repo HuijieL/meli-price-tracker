@@ -202,6 +202,17 @@ function buildPreface(latestDate) {
 `.trim();
 }
 
+// Mercado Livre blocked /products/{id}/items (403 PolicyAgent) from 2026-11-23,
+// which silently emptied every price cell. Surface it at the top of the email.
+function buildPriceWarning(total, priced) {
+  if (total === 0 || priced / total >= 0.5) return '';
+  return `
+<div style="margin:0 0 16px;padding:10px 12px;background:#fff4e5;border:1px solid #f0a020;border-radius:4px;color:#7a4b00;font-size:13px">
+  ⚠️ <strong>今日价格缺失</strong>：${priced}/${total} 个商品取到价格。Mercado Livre 拒绝了多卖家价格接口（403），排名与型号仍正常；格内「—」表示无价格。<br>
+  Prices unavailable today (${priced}/${total}): ML API denied the seller-price endpoint. Rankings are unaffected.
+</div>`.trim();
+}
+
 function buildFooter() {
   return `
 <hr style="border:none;border-top:1px solid #eee;margin-top:32px">
@@ -227,6 +238,8 @@ async function main() {
 
   const sections = [];
   let latestDate = '';
+  let latestTotal = 0;
+  let latestPriced = 0;
 
   for (const catId of CATEGORY_ORDER) {
     const cat = catsById[catId];
@@ -235,12 +248,17 @@ async function main() {
     if (history.length > 0) {
       const lastDate = history[history.length - 1].date;
       if (lastDate > latestDate) latestDate = lastDate;
+      for (const it of history[history.length - 1].items ?? []) {
+        latestTotal += 1;
+        if (it.min_price != null || it.buy_box_price != null) latestPriced += 1;
+      }
     }
     sections.push(buildCategoryTable(cat, history));
   }
 
   const html = [
     buildPreface(latestDate || '—'),
+    buildPriceWarning(latestTotal, latestPriced),
     sections.join('\n'),
     buildFooter(),
   ].join('\n');
